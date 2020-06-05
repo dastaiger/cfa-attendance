@@ -1,64 +1,159 @@
 import { Injectable } from '@angular/core';
 import { Course } from './course.model';
 import { Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import {map} from 'rxjs/operators';
+import { CoursesData } from './courseData.model';
 
 @Injectable({
   providedIn: 'root'
 })
 
+// periodicly fetch data from Backend!
+// implement a query to only fetch courses that are relevant (next 2 weeks?)
 
 
-
-export class CourseService {
+export class CourseService{
   coursesChanged = new Subject<Course[]>();
+  private courseData: CoursesData = new CoursesData('', []);
+  private courses: Course[] = [];
 
-   private courses: Course[] = [
-    new Course(new Date("Fri Dec 08 2019 07:44:57"), ["FitGuy"], "FitGuy")
-   ];
+  error = null;
 
-constructor( ) { }
+  constructor(private http: HttpClient) {}
 
-getCourse(date: any): Course {
-   return this.courses[0];
-  }
+
+
   getCourses(): Course[] {
+    console.log('return this courses: ' + this.courses);
     return this.courses;
    }
 
-createCourseData(){
-  for (let _i = 1; _i < 32; _i++) {
-    this.courses.push( new Course( new Date(2020, 5, _i,8,0,0,0),[]));
+  // seedCourseDataToBackend is intendet to seed the Database with courses
+  // only saves 1 ID the Arrey of courses with 250 elements, not as intended -> change the get method!
+  seedCourseDataToBackend(){
+    // create an 8am course for the next 250 days
+
+    for (let _i = 1; _i < 250; _i++) {
+      this.courses.push( new Course( new Date(2020, 5, _i, 8, 0, 0, 0), [''], ''));
+
+    }
+    this.storeCourses(this.courses);
+  }
+
+
+  createCourse(date: any, attendes: string[], respPerson: string) {
+    this.courses.push(new Course(date, attendes, respPerson));
+  }
+  register2Course(username: string, courseDate: Date) {
+    const index = this.courses.findIndex(
+      c => c.date.toDateString() === courseDate.toDateString());
+    // c => console.log(c.date.toDateString() === courseDate.toDateString()));
+    // console.log(index);
+    // 'const sub = this.fetchCourse(this.courses[index]).subscribe(
+    //     courseReq => { 
+    //       this.courses[this.courses[index].id] = courseReq;
+    //       console.log("Updated Course!")
+    //       console.log(courseReq)
+    //     }
+    //   );'
+    // sub.unsubscribe();
+    
+    console.log("run fetchCourse")
+
+    this.courses[index].attende.push(username);
+    console.log('Pushed user: '+ username +' to course with ID : ' + this.courses[index].id);
     this.coursesChanged.next(this.courses);
+    this.updateCourse(this.courses[index]);
   }
-}
 
-createCourse(date: any, attendes: string[], respPerson: string) {
-  this.courses.push(new Course(date, attendes, respPerson));
-}
-register2Course(username: string, courseDate: Date) {
+  unregisterFromCourse(username: string, courseDate: Date){
+    const index = this.courses.findIndex(c => c.date.toDateString() === courseDate.toDateString());
+    if (index === -1) {
+      alert('can not find this course!');
+      return;
+    }
+    const userIndex = this.courses[index].attende.findIndex(c => c === username);
   
-  const index = this.courses.findIndex(c => c.date.toDateString() === courseDate.toDateString());
-  // c => console.log(c.date.toDateString() === courseDate.toDateString())
-  console.log(index)
-  this.courses[index].attende.push(username);
-  console.log("Pushed user: "+ username +" to course index: " + index);
-  this.coursesChanged.next(this.courses);
+    if (index === -1) {
+      alert('can not find this user in this course!');
+      return;
+    }
+    if (userIndex === 0) {
+      this.courses[index].attende[userIndex] = "";
 
-}
+    } else {
+      this.courses[index].attende.splice(userIndex, 1);
+    }
 
-unregisterFromCourse(username: string, courseDate: Date){
-  const index = this.courses.findIndex(c => c.date.toDateString() === courseDate.toDateString());
-  if (index === -1) {
-    alert("can not find this course!")
-    return;
+    
+    this.coursesChanged.next(this.courses);
+    this.updateCourse(this.courses[index]);
   }
-  const userIndex = this.courses[index].attende.findIndex(c => c === username);
-  this.courses[index].attende.splice(userIndex, 1);
-  if (index === -1) {
-    alert("can not find this user in this course!")
-    return;
-  }
-}
 
+
+
+  storeCourses(courses: Course[]) {
+      const coursesData: Course[] = courses;
+      // Send Http request
+      this.http
+  .post(
+    'https://cfa-attendance.firebaseio.com/courses.json',
+    coursesData
+  )
+  .subscribe(responseData => {
+    console.log(responseData);
+  });
+
+  }
+
+  updateCourse(course: Course) {
+    this.http
+    .put(
+      'https://cfa-attendance.firebaseio.com/courses/' + this.courseData.id + '/' + course.id + '/attende.json',
+      course.attende
+    )
+    .subscribe(responseData => {
+      console.log(responseData);
+    });
+  }
+
+  fetchCourse(course: Course) {
+    
+    return this.http.get('https://cfa-attendance.firebaseio.com/courses/' + this.courseData.id + '/' + course.id + '.json');
+  }
+
+  fetchCourses() {
+    console.log('start Fetching');
+    this.http.get<{ [key: string]: Course[]}>('https://cfa-attendance.firebaseio.com/courses.json')
+      .pipe(map(responseData => {
+          // const courseArray: Course[] = [];
+          
+          for (const key in responseData) {
+          if (responseData.hasOwnProperty(key)) {
+            this.courseData.id = key;
+            for (const i of responseData[key].keys()){
+              this.courseData.courses.push({ ...responseData[key][i], id: i.toString()});
+             
+            }
+          }
+          }
+          for (let i = 0; i < this.courseData.courses.length; i++) {
+            this.courseData.courses[i].date = new Date(this.courseData.courses[i].date);
+            if (this.courseData.courses[i].attende[0] === ''){
+              this.courseData.courses[i].attende.splice(0,1);
+            }
+          }
+          
+          return this.courseData.courses;
+      })).subscribe(CourseArray => {
+        this.courses = CourseArray;
+        this.coursesChanged.next(this.courses);
+      }, error => {
+        this.error = error.error;
+        console.log(error);
+      });
+
+  }
 
 }

@@ -14,4 +14,7 @@ courses: Course[];
 
   constructor(private cs: CourseService) { }
 
+  seedCourses() {
+    this.cs.seedCourseDataToBackend();
+  }
 }

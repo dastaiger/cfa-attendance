@@ -1,9 +1,11 @@
 import { Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CourseService } from './course/course.service';
-import { DatePipe } from '@angular/common';
+
 import { Course } from './course/course.model';
 import { Subscription } from 'rxjs';
+import { isString } from 'util';
+
 
 
 @Component({
@@ -13,10 +15,13 @@ import { Subscription } from 'rxjs';
 })
 export class AppComponent implements OnInit, OnDestroy{
   @ViewChild('f', {static: true}) form: NgForm;
+  @ViewChild('schedule', {static: false})
+
   title = 'cfa-attendance';
   subCS: Subscription;
 
-  weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+
+  error = null;
 
   weeksCourses: Course[];
   thisweek = [];
@@ -24,12 +29,15 @@ export class AppComponent implements OnInit, OnDestroy{
 
   courses: Course[];
 
-  date = new Date();
-    day = this.date.getDay();
-     // gets day of month
-    year = this.date.getFullYear();
 
-    calWeek = new DatePipe('de').transform(this.date, 'w');
+
+  // data fetching in process?
+  isFetching = false;
+
+  // date = new Date();
+  // day = this.date.getDay();
+  // year = this.date.getFullYear();
+  // calWeek = new DatePipe('de').transform(this.date, 'w');
 
   username: string;
 
@@ -42,18 +50,23 @@ export class AppComponent implements OnInit, OnDestroy{
   // Use SetDate to clearn the hours etc.?
 
   ngOnInit() {
-
+    this.isFetching = true;
+    this.cs.fetchCourses();
     this.subCS = this.cs.coursesChanged.subscribe(
       (courses: Course[]) => {
+        console.log("this is the start date:" + this.weekStartDate)
+        console.log("course Changed!")
+        this.isFetching = true;
         this.courses = courses;
         this.weeksCourses = this.coursesThisWeek();
+        this.isFetching = false;
+        console.log("This weeks courses are: " + this.weeksCourses[0].attende)
       }
     );
-   this.cs.createCourseData();
-    this.courses = this.cs.getCourses();
-    this.findWeek();
 
-    
+    this.setThisWeekArray();
+    console.log("this weeks courses are:" +this.weeksCourses)
+   
     }
 
 
@@ -63,8 +76,8 @@ export class AppComponent implements OnInit, OnDestroy{
 
     coursesThisWeek(): Course[]{
       // check if Month is equal + if the dates are in the same week as the start week (monday  to friday +4)
-      return this.courses.filter(course => (
-        ( (this.weekStartDate.getMonth() === course.date.getMonth()) && 
+      return this.courses.filter(course => ((
+           (this.weekStartDate.getMonth() === course.date.getMonth()) && 
         (this.weekStartDate.getDate() <= course.date.getDate()) && 
          ((this.weekStartDate.getDate() + 4)  >=  course.date.getDate()))));
     }
@@ -87,16 +100,14 @@ export class AppComponent implements OnInit, OnDestroy{
     console.log('try to delete:' +user)
   }
 
-  findWeek() {
-    
-    const startDate = this.getMonday(new Date());
-
+  // sets the thisweek array to day monday - Friday to loop over in the HTML Template.a
+  // i guess this could be done better but works for now.
+  setThisWeekArray() {
+    const startDate = this.weekStartDate;
     startDate.setHours(8, 0, 0, 0);
-
     const dayInMonth = startDate.getDate();
 
     console.log('Monday was:' + startDate);
-
 
     // fill the current week (only 5 Days, Mo - Fr)
     for (let _i = 0; _i < 5; _i++) {
@@ -104,7 +115,7 @@ export class AppComponent implements OnInit, OnDestroy{
    }
   }
 
-
+  // find the first day of the week
    getMonday(d: Date) {
     d = new Date(d);
     let day = d.getDay(),

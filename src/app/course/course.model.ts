@@ -1,13 +1,16 @@
 
 export class Course {
-  public date: any;
+  public date: Date;
   public attende: string[];
   public responsible: string;
+  public id?: string;
  
 
-  constructor(date: any, attende?: string[], responsible?: string) {
+  constructor(date: Date, attende?: string[], responsible?: string) {
     this.date = date;
-    this.attende = attende;
+    this.attende = attende ? attende : [''];
     this.responsible = responsible;
   }
 }
+
+

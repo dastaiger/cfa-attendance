@@ -9,6 +9,7 @@ import { CourseComponent } from './course/course.component';
 import { registerLocaleData } from '@angular/common';
 import localeDe from '@angular/common/locales/de';
 import { CourseService } from './course/course.service';
+import { HttpClientModule } from '@angular/common/http';
 
 registerLocaleData(localeDe);
 
@@ -20,7 +21,8 @@ registerLocaleData(localeDe);
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FormsModule
+    FormsModule,
+    HttpClientModule
   ],
   providers: [CourseService],
   bootstrap: [AppComponent]
