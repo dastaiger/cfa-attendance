@@ -1,0 +1,172 @@
+<div class="container is-fluid">
+  <app-alert
+    [message]="error"
+    *ngIf="error"
+    (closed)="onHandleError()"
+  ></app-alert>
+
+  <div *ngIf="isLoading" style="text-align: center;">
+    <app-loading-spinner></app-loading-spinner>
+  </div>
+
+  <h1 class="mb-3 is-size-2" *ngIf="!isLoginMode">Sign Up</h1>
+  <h1 class="mb-3 is-size-2" *ngIf="isLoginMode">Log In</h1>
+  <form #f="ngForm" (ngSubmit)="onSubmit(f)" *ngIf="!isLoading">
+    <div class="field" *ngIf="!isLoginMode">
+      <label class="label">Username</label>
+      <div class="control has-icons-left has-icons-right">
+        <input
+          class="input"
+          type="string"
+          placeholder="username input"
+          value="pat"
+          ngModel
+          #name="ngModel"
+          name="name"
+          required
+        />
+        <span class="icon is-small is-left">
+          <i class="fas fa-envelope"></i>
+        </span>
+        <span
+          *ngIf="!name.invalid && (name.dirty || name.touched)"
+          class="icon is-small is-right"
+        >
+          <i class="fas fa-check"></i>
+        </span>
+        <span
+          *ngIf="name.invalid && (name.dirty || name.touched)"
+          class="icon is-small is-right"
+        >
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
+      </div>
+      <p
+        *ngIf="email.invalid && (email.dirty || email.touched)"
+        class="help is-danger"
+      >
+        This Username is invalid
+      </p>
+    </div>
+
+    <div class="field">
+      <label class="label">Email</label>
+      <div class="control has-icons-left has-icons-right">
+        <input
+          class="input"
+          type="email"
+          placeholder="Email input"
+          value="hello@"
+          ngModel
+          #email="ngModel"
+          name="email"
+          required
+          email
+        />
+        <span class="icon is-small is-left">
+          <i class="fas fa-envelope"></i>
+        </span>
+        <span
+          *ngIf="!email.invalid && (email.dirty || email.touched)"
+          class="icon is-small is-right"
+        >
+          <i class="fas fa-check"></i>
+        </span>
+        <span
+          *ngIf="email.invalid && (email.dirty || email.touched)"
+          class="icon is-small is-right"
+        >
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
+      </div>
+      <p
+        *ngIf="email.invalid && (email.dirty || email.touched)"
+        class="help is-danger"
+      >
+        This email is invalid
+      </p>
+    </div>
+
+    <!-- <div class="form-group">
+        <label for="email">E-Mail</label>
+        <input
+          type="email"
+          id="email"
+          class="form-control"
+          ngModel
+          name="email"
+          required
+          email
+        />
+      </div> -->
+
+    <div class="field">
+      <label class="label">Password</label>
+      <div class="control has-icons-left has-icons-right">
+        <input
+          class="input"
+          type="password"
+          placeholder="Password"
+          type="password"
+          id="password"
+          ngModel
+          #password="ngModel"
+          required
+          name="password"
+          minlength="6"
+        />
+        <span class="icon is-small is-left">
+          <i class="fas fa-lock"></i>
+        </span>
+
+        <span
+          *ngIf="!password.invalid && (password.dirty || password.touched)"
+          class="icon is-small is-right"
+        >
+          <i class="fas fa-check"></i>
+        </span>
+        <span
+          *ngIf="password.invalid && (password.dirty || password.touched)"
+          class="icon is-small is-right"
+        >
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
+      </div>
+      <p
+        *ngIf="password.invalid && (password.dirty || password.touched)"
+        class="help is-danger"
+      >
+        This Password has to be at least 6 chars long!
+      </p>
+    </div>
+
+    <!-- <div class="form-group">
+        <label for="password">password</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          ngModel
+          required
+          name="password"
+          minlength="6"
+        />
+      </div> -->
+    <div>
+      <button type="submit" [disabled]="!f.valid" class="button is-primary">
+        {{ isLoginMode ? "LogIn" : "Sign Up" }}
+      </button>
+
+      <button
+        type="button"
+        (click)="onSwitchMode()"
+        class="button is-light ml-3"
+      >
+        {{ isLoginMode ? "switch to SignUp" : "switch to Login Mode" }}
+      </button>
+    </div>
+  </form>
+  <!-- <div *ngIf="error">
+            An error has occured: {{ error }}
+        </div> -->
+</div>

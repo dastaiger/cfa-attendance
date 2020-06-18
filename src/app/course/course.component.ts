@@ -6,13 +6,13 @@ import { CourseService } from './course.service';
 @Component({
   selector: 'app-course',
   templateUrl: './course.component.html',
-  styleUrls: ['./course.component.css']
+  styleUrls: ['./course.component.scss'],
 })
-export class CourseComponent  {
-course: Course;
-courses: Course[];
+export class CourseComponent {
+  course: Course;
+  courses: Course[];
 
-  constructor(private cs: CourseService) { }
+  constructor(private cs: CourseService) {}
 
   seedCourses() {
     this.cs.seedCourseDataToBackend();
