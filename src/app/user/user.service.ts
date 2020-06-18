@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { AuthUser } from '../auth/authUser.model';
 import { User } from './User.model';
+import { retry } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
@@ -20,8 +21,8 @@ export class UserService {
   }
 
   getUser(id: string) {
-    return this.http.get<User>(
-      'https://cfa-attendance.firebaseio.com/users/' + id + '.json'
-    );
+    return this.http
+      .get<User>('https://cfa-attendance.firebaseio.com/users/' + id + '.json')
+      .pipe(retry(2));
   }
 }

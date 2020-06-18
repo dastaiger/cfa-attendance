@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Course } from './course.model';
 import { Subject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, retry } from 'rxjs/operators';
 import { CoursesData } from './courseData.model';
 
 @Injectable({
@@ -98,7 +98,6 @@ export class CourseService {
     this.updateCourse(this.courses[index]);
   }
 
-  
   storeCourses(courses: Course[]) {
     const coursesData: Course[] = courses;
     // Send Http request
@@ -141,6 +140,7 @@ export class CourseService {
         'https://cfa-attendance.firebaseio.com/courses.json'
       )
       .pipe(
+        retry(2),
         map((responseData) => {
           this.courseData = new CoursesData('', []);
 

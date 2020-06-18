@@ -117,8 +117,8 @@ export class AuthService {
           localStorage.setItem('userData', JSON.stringify(newUser));
         });
     }
-    console.log('user next ' + name);
-    this.user.next(newUser);
+    
+   // this.user.next(newUser);
 
     localStorage.setItem('userData', JSON.stringify(newUser));
     this.autoLogout(expireIn * 1000);
