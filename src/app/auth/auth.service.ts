@@ -96,6 +96,8 @@ export class AuthService {
     const expDate = new Date(new Date().getTime() + +expireIn * 1000);
 
     const newUser = new AuthUser(email, localID, token, expDate, name);
+    console.log('user next ' + name);
+    this.user.next(newUser);
 
     if (!name) {
       this.userService
@@ -113,7 +115,6 @@ export class AuthService {
           this.user.next(newUser);
 
           localStorage.setItem('userData', JSON.stringify(newUser));
-          
         });
     }
     console.log('user next ' + name);
