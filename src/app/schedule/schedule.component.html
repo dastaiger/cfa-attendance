@@ -1,101 +1,124 @@
-<form  (ngSubmit)="onSubmit(f)" #f="ngForm" class=" row justify-content-between">
-    <div class="form-group col-8">
-      <p>When do you want to train?
-     
-      <div>
-      <div class="custom-control custom-checkbox custom-control-inline" *ngFor="let day of thisweek" >
-        <input type="checkbox" class="custom-control-input" id={{day}} [value]="day" name={{day}} ngModel>
-        <label class="custom-control-label"   for={{day}} >{{day | date: "E" }}</label>
+<!-- <form (ngSubmit)="onSubmit(f)" #f="ngForm" class="container mx-2">
+  <div class="container has-text-centered">
+    <p class="mb-3 has-text-centered">
+      Hi
+      <span class="has-text-weight-bold is-capitalized">{{ username }}</span> -
+      When do you want to train?
+    </p>
+
+    <div class="level has-text-centered">
+      <div class="checkbox mx-2" *ngFor="let day of thisweek">
+        <input
+          type="checkbox"
+          class="checkbox"
+          id="{{ day }}"
+          [value]="day"
+          name="{{ day }}"
+          ngModel
+        />
+        <label class="checkbox ml-1" for="{{ day }}">{{
+          day | date: "E"
+        }}</label>
       </div>
     </div>
+    <button
+      [disabled]="!f.valid"
+      class="button is-primary is-outlined is-small"
+      type="submit"
+    >
+      register
+    </button>
   </div>
-    
-    <div  class="col-4 ">
-      Your Name
-      <div class=" form-group input-group flex-nowrap">
-        <div class="input-group-prepend">
-          <!-- <span class="input-group-text" id="addon-wrapping">@</span> -->
-        </div>
-        <input type="text" class="form-control" placeholder="name" aria-label="Username" aria-describedby="addon-wrapping" name="username" required ngModel>
-      
-      </div>
-      <button [disabled]="!f.valid" class="btn btn-primary" type="submit">register</button>
-    </div>
-    </form>
+</form> -->
 
-  <div>
-  <hr>
-  <div class="row justify-content-between">
-    <div class="col-1 pb-3">
-          <fa-icon style="cursor: pointer;" [routerLink]="['/course', dateParam-1 ]" routerLinkActive="router-link-active" class="fa-2x" [icon]="faAngleLeft"> </fa-icon>
+<app-alert
+  [message]="error"
+  *ngIf="error"
+  (closed)="onHandleError()"
+></app-alert>
+
+<div>
+  <div class="container has-text-centered">
+    <p class="mb-3 has-text-centered">
+      Hi
+      <span class="has-text-weight-bold is-capitalized">{{ username }}</span>
+    </p>
+    <p>Click the Day to register</p>
+    <p class="mb-2">Click your Name to unregister</p>
+  </div>
+  <hr />
+  <div class="level is-mobile">
+    <div class="level-item">
+      <span class="icon">
+        <i
+          style="cursor: pointer;"
+          [routerLink]="['/course', dateParam - 1]"
+          routerLinkActive="router-link-active"
+          class="fas fa-2x fa-angle-left is-pulled-left"
+        ></i>
+      </span>
     </div>
-    <div class="mx-auto mt-1" style="width: 200px;">
-        <h3>Our Schedule:</h3>
+    <div class="level-item has-text-centered">
+      <h3 class="is-size-4">Our Schedule:</h3>
     </div>
-    <div class="col-1 mb-3">
-          <fa-icon style="cursor: pointer;" [routerLink]="['/course', dateParam+1 ]"
-          routerLinkActive="router-link-active" class="fa-2x float-right" [icon]="faAngleRight"> </fa-icon>
+    <div class="level-item">
+      <span class="icon">
+        <i
+          style="cursor: pointer;"
+          [routerLink]="['/course', dateParam + 1]"
+          routerLinkActive="router-link-active"
+          class="fas fa-2x fa-angle-right is-pulled-right"
+        ></i>
+      </span>
+
+      <!-- <fa-icon
+        style="cursor: pointer;"
+        [routerLink]="['/course', dateParam + 1]"
+        routerLinkActive="router-link-active"
+        class="fa-2x is-pulled-right"
+        [icon]="faAngleRight"
+      >
+      </fa-icon> -->
     </div>
   </div>
-  
-
-    
-
-  
 
   <p *ngIf="isFetching">loading...</p>
 
-  <table *ngIf="!isFetching" class="table table-striped  table-sm mr-2">
+  <table
+    *ngIf="!isFetching"
+    class="table is-striped is-narrow is-hoverable is-fullwidth"
+  >
     <thead>
       <tr>
-        <th scope="col">#</th>
-        <th *ngFor="let day of thisweek" scope="col">{{day | date: "E"}} <br>{{day | date: "d.M"}}</th>
+        <th>#</th>
+        <th
+          *ngFor="let day of thisweek"
+          (click)="register(day)"
+          style="cursor: pointer;"
+        >
+          {{ day | date: "E" }} <br />{{ day | date: "d.M" }}
+        </th>
       </tr>
     </thead>
-     <tbody>
+    <tbody>
       <!-- <ng-container *ngFor="let course of weeksCourses" > -->
       <!-- <ng-container *ngFor="let person of course.attende; let i = index">  -->
-      <tr>
-        <th scope="row">1</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[0])" *ngFor="let course of weeksCourses" >{{course.attende[0]}}</td>
-      </tr>
-      <tr>
-        <th scope="row">2</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[1])" *ngFor="let course of weeksCourses" >{{course.attende[1]}}</td>
-      </tr>
-      <tr>
-        <th scope="row">3</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[2])" *ngFor="let course of weeksCourses" >{{course.attende[2]}}</td>
-      </tr>
-      <tr>
-        <th scope="row">4</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[3])" *ngFor="let course of weeksCourses" >{{course.attende[3]}}</td>
-      </tr>
-      <tr>
-        <th scope="row">5</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[4])" *ngFor="let course of weeksCourses" >{{course.attende[4]}}</td>
-      </tr>
-      <tr>
-        <th scope="row">6</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[5])" *ngFor="let course of weeksCourses" >{{course.attende[5]}}</td>
-      </tr>
-      <tr>
-        <th scope="row">7</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[6])" *ngFor="let course of weeksCourses" >{{course.attende[6]}}</td>
-      </tr>
-      <tr>
-        <th scope="row">8</th>  
-        <td style="cursor: pointer;" (click)= "onDelete(course, course.attende[7])" *ngFor="let course of weeksCourses" >{{course.attende[7]}}</td>
-      </tr>
+      <ng-container *ngFor="let i of [0, 1, 2, 3, 4, 5, 6, 7]">
+        <tr>
+          <th scope="row">{{ i + 1 }}</th>
+          <td
+            style="cursor: pointer;"
+            (click)="onDelete(course, course.attende[i])"
+            *ngFor="let course of weeksCourses"
+          >
+            {{
+              course.attende && course.attende.length > i
+                ? course.attende[i]
+                : ""
+            }}
+          </td>
+        </tr>
+      </ng-container>
     </tbody>
-  
   </table>
-  
-  <p  *ngIf="!isFetching">Klick a name in the schedule to delete it!</p>
-
-  
-  
-
-  </div>
-
-  
+</div>
